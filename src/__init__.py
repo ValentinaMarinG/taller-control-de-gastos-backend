@@ -1,6 +1,8 @@
 from flask import Flask
 from os import environ
 
+from src.database import db, ma, migrate
+
 from src.endpoints.users import users
 from src.endpoints.incomes import incomes
 from src.endpoints.outgoes import outgoes
@@ -26,5 +28,9 @@ def create_app():
     app.register_blueprint(users)
     app.register_blueprint(incomes)
     app.register_blueprint(outgoes)
+    
+    db.init_app(app)
+    ma.init_app(app)
+    migrate.init_app(app, db)
     
     return app
