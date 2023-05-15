@@ -1,9 +1,10 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from http import HTTPStatus
 import sqlalchemy.exc
 import werkzeug
 
-from src.database import db
+from src.database import db, jwt 
 
 from src.models.user import User,  user_schema, users_schema
 
@@ -38,23 +39,26 @@ def create():
     
     return {"data": user_schema.dump(user)}, HTTPStatus.CREATED
        
-@users.get("/")
+@users.get("/all")
 def read_all():
     users = User.query.order_by(User.name).all()
     
     return {"data": users_schema.dump(users)}, HTTPStatus.OK
 
-@users.get("/<string:id>")
-def read_one(id):
-    user = User.query.filter_by(id=id).first()
+@users.get("/")
+@jwt_required()
+def read_one():
+    user_id = user_schema.dump(get_jwt_identity())["id"]
+    user = User.query.filter_by(id=user_id).first()
     
     if(not user):
         return {"error": "Resource not found"}, HTTPStatus.NOT_FOUND
     
     return {"data": user_schema.dump(user)}, HTTPStatus.OK
 
-@users.put("/<string:id>")
-def update(id):
+@users.put("/")
+@jwt_required()
+def update():
     post_data = None
     
     try:
@@ -64,7 +68,8 @@ def update(id):
         return {"error":"Put body JSON data not found",
                 "message": str(e)}, HTTPStatus.BAD_REQUEST
         
-    user = User.query.filter_by(id=id).first()
+    user_id = user_schema.dump(get_jwt_identity())["id"]
+    user = User.query.filter_by(id=user_id).first()
     
     if(not user):
         return {"error":"Resource not found"}, HTTPStatus.NOT_FOUND
@@ -83,9 +88,11 @@ def update(id):
     
     return {"data": user_schema.dump(user)}, HTTPStatus.OK
 
-@users.delete("/<string:id>")
-def delete(id):
-    user = User.query.filter_by(id=id).first()
+@users.delete("/")
+@jwt_required()
+def delete():
+    user_id = user_schema.dump(get_jwt_identity())["id"]
+    user = User.query.filter_by(id=user_id).first()
     
     if(not user):
         return {"error":"Resource not found"}, HTTPStatus.NOT_FOUND
@@ -99,12 +106,10 @@ def delete(id):
     
     return {"data": ""}, HTTPStatus.NO_CONTENT
 
-@users.post("/auth")
-def authentication(id):
-    return "Authenticating an user ... soon"
-
-@users.get("/<string:user_id>/balance")
-def CalculateBalance(user_id):
+@users.get("/balance")
+@jwt_required()
+def CalculateBalance():
+    user_id = user_schema.dump(get_jwt_identity())["id"]
     user = User.query.filter_by(id=user_id).first()
     
     if(not user):
@@ -115,4 +120,4 @@ def CalculateBalance(user_id):
     
     total_balance = income_total - outgo_total
     
-    return {"balance": total_balance}
+    return {"Total ingresos":income_total, "Total egresos":outgo_total, "balance": total_balance}, HTTPStatus.OK
