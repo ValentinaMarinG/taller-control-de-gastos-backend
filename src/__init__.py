@@ -22,8 +22,8 @@ def create_app():
             config_class = 'config.ProductionConfig'
         case _:
             print(f"ERROR: environment unknown: {app.config.get('ENVIRONMENT')}")
-            app.config['ENVIRONMENT'] = "development"
     
+    app.config['ENVIRONMENT'] = "development"
     app.config.from_object(config_class)
     
     app.register_blueprint(users)
