@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from http import HTTPStatus
+from datetime import datetime
 import sqlalchemy.exc
 import werkzeug
 
@@ -103,7 +104,10 @@ def update(id):
     if(not outgo.user_id==user.id):
         return {"error":"Outgo not valid"}, HTTPStatus.BAD_REQUEST
     
-    outgo.value = request.get_json().get('value', outgo.value)
+    outgo.description = request.get_json().get('description', outgo.description)
+    outgo.date        = request.get_json().get('date', outgo.date)
+    outgo.hour        = request.get_json().get('hour', outgo.hour)
+    outgo.value       = request.get_json().get('value', outgo.value)
     
     try:
         db.session.commit()

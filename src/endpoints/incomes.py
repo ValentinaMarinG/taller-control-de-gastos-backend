@@ -64,7 +64,7 @@ def read_by_date():
     start_date = request.get_json().get("start_date", None)
     end_date = request.get_json().get("end_date", None)
     
-    incomes = Income.query.filter_by(user_id=user.id).filter(Income.date >= start_date and Income.date <= end_date).all()
+    incomes = Income.query.filter_by(user_id=user.id).filter(Income.date >= start_date).filter(Income.date <= end_date).all()
     
     return {"data": incomes_schema.dump(incomes)}, HTTPStatus.OK
 

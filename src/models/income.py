@@ -7,10 +7,10 @@ class Income(db.Model):
     id           = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     description  = db.Column(db.String(100), nullable=False)
     date         = db.Column(db.Date, nullable=False)
-    hour         = db.Column(db.Time, nullable=False)
+    hour         = db.Column(db.Time, nullable=True)
     value        = db.Column(db.Float, nullable=False)
-    create_at   = db.Column(db.DateTime, default=datetime.now())
-    update_at   = db.Column(db.DateTime, onupdate=datetime.now())
+    created_at   = db.Column(db.DateTime, default=datetime.now())
+    updated_at   = db.Column(db.DateTime, onupdate=datetime.now())
     
     user_id      = db.Column(db.String(10),
                              db.ForeignKey('user.id',

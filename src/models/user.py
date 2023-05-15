@@ -17,8 +17,8 @@ class User(db.Model):
     email        = db.Column(db.String(60), unique=True, nullable=False)
     password     = db.Column(db.String(128), nullable=False)
     
-    create_at   = db.Column(db.DateTime, default=datetime.now)
-    update_at   = db.Column(db.DateTime, onupdate=datetime.now)
+    created_at   = db.Column(db.DateTime, default=datetime.now)
+    updated_at   = db.Column(db.DateTime, onupdate=datetime.now)
 
     incomes = db.relationship('Income', backref='owner')
     outgoes = db.relationship('Outgo', backref='owner')
